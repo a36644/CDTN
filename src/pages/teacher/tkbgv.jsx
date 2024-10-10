@@ -3,13 +3,13 @@ import { FcInfo } from "react-icons/fc";
 import { useEffect, useState } from "react";
 import { fetchData } from "../../lib/api";
 
-const Tkb = () => {
+const Tkbgv = () => {
   const [tkb, setTkb] = useState([]);
   const [semester, setSemester] = useState([]);
   const [selectedSemester, setSelectedSemester] = useState(null);
 
   useEffect(() => {
-    fetchData("student/getAllSemesterGroup")
+    fetchData("teacher/getAllSemester")
       .then((result) => {
         setSemester(
           result.map((item) => {
@@ -27,7 +27,7 @@ const Tkb = () => {
 
   useEffect(() => {
     if (selectedSemester) {
-      fetchData(`student/getTimeTable?semesterId=${selectedSemester}`)
+      fetchData(`teacher/getSchedule?semester=${selectedSemester}`)
         .then((result) => {
           console.log("🚀 ~ .then ~ result:", result)
           setTkb(result);
@@ -175,4 +175,4 @@ const Tkb = () => {
   );
 };
 
-export default Tkb;
+export default Tkbgv;

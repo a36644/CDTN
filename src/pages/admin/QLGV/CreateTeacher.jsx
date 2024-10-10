@@ -7,8 +7,7 @@ const CreateTeacher = () => {
             <FcInfo className="w-[33px] h-[33px]"/>
             <h1 className="text-[1.4993rem] pl-[8px] font-bold text-red-700 uppercase">Thêm giáo viên</h1>
         </div>
-        <hr className="mb-4"></hr>
-        
+        <hr className="mb-4"></hr>    
 
     <form className="max-w-md mx-auto">
         <div className="relative z-0 w-full mb-5 group">
@@ -62,3 +61,4 @@ const CreateTeacher = () => {
 }
 
 export default CreateTeacher
+

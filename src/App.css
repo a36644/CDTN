@@ -6,3 +6,17 @@
 .box ::-webkit-scrollbar { 
   width: 0px !important;
 }
+
+.p-multiselect-close {
+  display: none;
+}
+
+.p-checkbox .p-checkbox-box {
+  border: 2px solid #afafaf;
+  border-radius: 3px;
+}
+
+.p-checkbox.p-highlight .p-checkbox-box {
+  border-color: #007ad9; 
+}
+

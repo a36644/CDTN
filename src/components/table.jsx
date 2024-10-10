@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-// eslint-disable-next-line react/prop-types
 const Table = ({ columns, data }) => {
     return (
         <table className="w-full text-xs text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -22,9 +21,9 @@ const Table = ({ columns, data }) => {
                         key={rowIndex}
                         className={`${
                             rowIndex % 2 === 0
-                                ? 'odd:bg-white odd:dark:bg-gray-900'
-                                : 'even:bg-gray-50 even:dark:bg-gray-800'
-                        } border-b dark:border-gray-700`}
+                                ? 'odd:bg-white'
+                                : 'even:bg-gray-50'
+                        } border-b`}
                     >
                         {columns.map((col) => (
                             <td
