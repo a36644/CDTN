@@ -116,6 +116,7 @@ const GetAllCourseSemesterGroup = () => {
     closeModalNewCours();
   };
 
+  // eslint-disable-next-line no-unused-vars
   const handleDelete = (id) => {
     const confirm = window.confirm("Bạn có chắc chắn muốn xóa không?");
     if (confirm) {
@@ -144,6 +145,7 @@ const GetAllCourseSemesterGroup = () => {
   // Hàm đóng modal
 
   // Hàm chỉnh sửa
+  // eslint-disable-next-line no-unused-vars
   const handleEdit = (id) => {
     const course = courses.find((course) => course.id === id);
     if (course) {
@@ -229,7 +231,7 @@ const GetAllCourseSemesterGroup = () => {
                   value={searchTerm}
                   onChange={handleSearch}
                   className="h-[38px] block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-md bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Mã học kỳ, tên môn học..."
+                  placeholder="Mã lớp, tên lớp..."
                   required
                 />
                 <button
@@ -260,11 +262,11 @@ const GetAllCourseSemesterGroup = () => {
             <table className="w-full text-xs text-left rtl:text-right text-gray-500">
               <thead className="text-gray-700 bg-gray-50">
                 <tr className="text-center">
-                  <th className="px-4 py-3 w-20">ID</th>
-                  <th className="px-4 py-3">Tên môn học</th>
+                  <th className="px-4 py-3 w-20">Id</th>
+                  <th className="px-4 py-3">Tên môn</th>
                   <th className="px-4 py-3">Kỳ học</th>
                   <th className="px-4 py-3">Lịch học</th>
-                  <th className="px-4 py-3 w-[150px]">Chức năng</th>
+                  {/* <th className="px-4 py-3 w-[150px]">Chức năng</th> */}
                 </tr>
               </thead>
               <tbody>
@@ -294,7 +296,7 @@ const GetAllCourseSemesterGroup = () => {
                               : <FaAngleDown />}
                           </button>
                         </td>
-                        <td className="px-6 py-4 border-b border-gray-300">
+                        {/* <td className="px-6 py-4 border-b border-gray-300">
                           <button
                             onClick={() => handleEdit(course.id)}
                             className="mr-auto px-2 text-blue-600"
@@ -307,7 +309,7 @@ const GetAllCourseSemesterGroup = () => {
                           >
                             Xóa
                           </button>
-                        </td>
+                        </td> */}
                       </tr>
 
                       {/* Expanded Row Content */}

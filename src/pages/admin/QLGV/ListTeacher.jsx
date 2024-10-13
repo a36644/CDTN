@@ -53,7 +53,6 @@ const TeacherList = () => {
   // Hàm thêm/sửa giáo viên
   const onSubmit = (data) => {
     if (editingId !== null) {
-      // Cập nhật sinh viên
       setLoading(true);
       putData("admin/User/updateUpdate", {
         ...data,
@@ -75,6 +74,7 @@ const TeacherList = () => {
       })
         .then(() => {
           setIsRefresh(!isRefresh);
+          toast.success("Thêm giáo viên thành công");
         })
         .catch((e) => {
           toast.error(e.response.data);
@@ -106,6 +106,7 @@ const TeacherList = () => {
     setEditingId(null);
   };
 
+  // eslint-disable-next-line no-unused-vars
   const handleDelete = (data) => {
     const confirm = window.confirm("Bạn có chắc chắn muốn xóa không?");
     if (confirm) {
@@ -203,7 +204,7 @@ const TeacherList = () => {
                 <th className="px-4 py-3">Địa chỉ Email</th>
                 <th className="px-4 py-3">Số điện thoại</th>
                 <th className="px-4 py-3">Khoa</th>
-                <th className="px-4 py-3 w-[150px]">Chức năng</th>
+                {/* <th className="px-4 py-3 w-[150px]">Chức năng</th> */}
               </tr>
             </thead>
             <tbody>
@@ -241,12 +242,12 @@ const TeacherList = () => {
                       >
                         Sửa
                       </button> */}
-                      <button
+                      {/* <button
                         onClick={() => handleDelete(teacher.personId)}
                         className="ml-auto px-2 text-red-600"
                       >
                         Xóa
-                      </button>
+                      </button> */}
                     </td>
                   </tr>
                 ))

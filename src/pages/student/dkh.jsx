@@ -29,7 +29,6 @@ const transformData = (subjectName, data) => {
 const Dkh = () => {
   const [selected, setSelected] = useState({});
   const [openSubject, setOpenSubject] = useState(null);
-
   const [classRoom, setClassRoom] = useState([]);
   const [subjectsData, setSubjectsData] = useState();
   const [isRefresh, setIsRefresh] = useState(false);
@@ -55,6 +54,8 @@ const Dkh = () => {
         .reduce((result, course) => {
           const classRooms = course.classRoomDtos.map((classRoom) => ({
             name: classRoom.classRoomId,
+            currentSlot: classRoom.currentSlot,
+            maxSlot: classRoom.maxSlot,
             schedules: classRoom.lichHocList.map((lichHoc) => ({
               start: lichHoc.start,
               end: lichHoc.finish,
@@ -68,16 +69,27 @@ const Dkh = () => {
       setSubjectsData(output);
     }
   }, [classRoom]);
+
   const handleClassSelect = (subject, className, schedules) => {
     const newSelected = { ...selected };
     const key = `-${className}`;
-  
+    let previousClassName = null; // Lưu lại lớp đã chọn trước đó (nếu có)
+
     // Nếu lớp đã được chọn, tiến hành hủy đăng ký
     if (newSelected[key]) {
       deleteData(`student/register/remove?id=${className}`)
         .then(() => {
           delete newSelected[key];
           setSelected(newSelected);
+
+          // Cập nhật lại currentSlot cho lớp vừa hủy
+          const updatedSubjectsData = { ...subjectsData };
+          const classToUpdate = updatedSubjectsData[subject].classes.find(
+            (cls) => cls.name === className
+          );
+          classToUpdate.currentSlot -= 1;
+
+          setSubjectsData(updatedSubjectsData);
           setIsRefresh(!isRefresh);
           toast.success("Đã hủy đăng ký lớp học thành công");
         })
@@ -85,19 +97,34 @@ const Dkh = () => {
           toast.error(e.response?.data || "Hủy đăng ký thất bại");
         });
     } else {
-      // Xóa lớp đã chọn trước đó cho môn học này
+      // Kiểm tra lớp đã đăng ký trước đó (nếu có)
       Object.keys(newSelected).forEach((selectedKey) => {
         if (selectedKey.startsWith(`${subject}-`)) {
+          previousClassName = newSelected[selectedKey].className;
+
+          const previousClass = subjectsData[subject].classes.find(
+            (cls) => cls.name === previousClassName
+          );
+
+          previousClass.currentSlot -= 1; // Giảm currentSlot cho lớp cũ
           delete newSelected[selectedKey]; // Xóa lớp cũ
         }
       });
-  
       // Thêm lớp mới
       newSelected[key] = { className, schedules };
       fetchData(`student/register/add?id=${className}`)
         .then(() => {
           setSelected(newSelected);
-          setIsRefresh(!isRefresh); // Cập nhật lại trạng thái
+
+          // Cập nhật lại currentSlot cho lớp mới
+          const updatedSubjectsData = { ...subjectsData };
+          const classToUpdate = updatedSubjectsData[subject].classes.find(
+            (cls) => cls.name === className
+          );
+          classToUpdate.currentSlot += 1;
+
+          setSubjectsData(updatedSubjectsData);
+          setIsRefresh(!isRefresh);
           toast.success("Đăng ký lớp học thành công");
         })
         .catch((e) => {
@@ -105,6 +132,7 @@ const Dkh = () => {
         });
     }
   };
+
   const toggleSubject = (subject) => {
     setOpenSubject((prev) => (prev === subject ? null : subject));
   };
@@ -114,8 +142,8 @@ const Dkh = () => {
     Object.entries(selected).forEach(([key, { className, schedules }]) => {
       schedules.forEach(({ start, end, gv, room }) => {
         for (let period = start; period <= end; period++) {
-          const periodIndex = (period % 10);
-          const dayIndex = Math.floor((period) / 10);
+          const periodIndex = period % 10;
+          const dayIndex = Math.floor(period / 10);
           timetable[periodIndex][dayIndex] = {
             subject: key.split("-")[0],
             class: className,
@@ -224,7 +252,7 @@ const Dkh = () => {
                   }
                   return acc;
                 }, {})
-              ).map(([name, { schedules }]) => (
+              ).map(([name, { schedules, currentSlot, maxSlot }]) => (
                 <li key={name} className="flex items-center">
                   <input
                     type="checkbox"
@@ -244,9 +272,15 @@ const Dkh = () => {
                     className="cursor-pointer rounded p-2 mr-2 hover:text-blue-700"
                   >
                     {`${name} (${schedules
-                      .map((s) => `Thứ ${Math.floor((s.start+20)/10)}: ${(s.start+1)%10}-${(s.end+1)%10}`)
+                      .map(
+                        (s) =>
+                          `Thứ ${Math.floor((s.start + 20) / 10)}: ${
+                            (s.start + 1) % 10
+                          }-${(s.end + 1) % 10}`
+                      )
                       .join(" | ")})`}
                   </span>
+                  <span className="text-gray-500 ml-2">{`Slots: ${currentSlot}/${maxSlot}`}</span>
                 </li>
               ))}
             </ul>

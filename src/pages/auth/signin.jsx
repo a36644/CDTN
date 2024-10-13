@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 
 const SignIn = () => {
-  const { register, handleSubmit, reset, setValue, watch } = useForm();
+  const { register, handleSubmit} = useForm();
   const navigate = useNavigate();
 
   const onSubmit = (values) => {
@@ -36,7 +36,7 @@ const SignIn = () => {
           }
         }
       })
-      .catch((e) => console.log(e));
+      .catch(() => toast.error("Đăng nhập thất bại"));
   };
   return (
     <div className="flex h-[100vh]">

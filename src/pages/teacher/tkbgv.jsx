@@ -39,14 +39,13 @@ const Tkbgv = () => {
   }, [selectedSemester]);
 
   const createTimetable = () => {
-    // Tạo một bảng với 10 tiết và 7 ngày (Thứ 2 đến Chủ nhật)
     const timetable = Array.from({ length: 10 }, () => Array(7).fill(null));
 
     // Chuyển đổi dữ liệu mẫu vào bảng
     tkb.forEach(({ classRoomId, classRoomName, roomId, start, end }) => {
       for (let period = start; period <= end; period++) {
-        const periodIndex = (period % 10) - 1; // Giả sử period là 1-10
-        const dayIndex = Math.floor((period - 1) / 10); // Giả sử 10 tiết/tuần
+        const periodIndex = (period % 10);
+        const dayIndex = Math.floor((period) / 10);
 
         timetable[periodIndex][dayIndex] = {
           classRoomId,

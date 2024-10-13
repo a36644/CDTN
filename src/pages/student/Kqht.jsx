@@ -86,9 +86,9 @@ const Kqht = () => {
               <th className="border border-gray-400 py-2 w-[10%]">Mã môn học</th>
               <th className="border border-gray-400 py-2">Tên môn học</th>
               <th className="border border-gray-400 py-2">Số TC</th>
-              <th className="border border-gray-400 py-2">Môn tương đương</th>
-              <th className="border border-gray-400 py-2">Điểm</th>
-              <th className="border border-gray-400 py-2">Điểm chữ</th>
+              <th className="border border-gray-400 py-2">Điểm quá trình</th>
+              <th className="border border-gray-400 py-2">Điểm cuối kỳ</th>
+              <th className="border border-gray-400 py-2">Điểm tổng kết</th>
               <th className="border border-gray-400 py-2">Kết quả</th>
             </tr>
           </thead>
@@ -100,7 +100,7 @@ const Kqht = () => {
                     {index + 1}
                   </td>
                   <td className="px-6 py-4 border-b border-gray-300">
-                    {transcript.courseId}
+                    {transcript.courseID}
                   </td>
                   <td className="px-6 py-4 border-b border-gray-300">
                     {transcript.courseName}
@@ -109,16 +109,16 @@ const Kqht = () => {
                     {transcript.credits}
                   </td>
                   <td className="px-6 py-4 border-b border-gray-300">
-                    {transcript.credits}
+                    {transcript.midScore}
                   </td>
                   <td className="px-6 py-4 border-b border-gray-300">
-                    {transcript.coefficient}
+                    {transcript.endScore}
                   </td>
                   <td className="px-6 py-4 border-b border-gray-300">
-                    {transcript.reqiId}
+                    {transcript.finalScore}
                   </td>
                   <td className="px-6 py-4 border-b border-gray-300">
-                    {transcript.requestCredits}
+                    {transcript.status}
                   </td>
                 </tr>
               ))

@@ -1,11 +1,8 @@
-import Select from "react-select";
 import { FcInfo } from "react-icons/fc";
 import { useEffect, useState } from "react";
 import { fetchData } from "../../lib/api";
 import { toast } from "react-toastify";
 import LoadingSpinner from "../../components/LoadingSpinner";
-
-const ctdt = [{ value: "CNTT-K32", label: "Công nghệ thông tin - Khóa 32" }];
 
 const Ctdt = () => {
   const [TrainingPrograms, setTrainingPrograms] = useState([]);
@@ -39,17 +36,8 @@ const Ctdt = () => {
       </div>
       <hr className="mb-3"></hr>
       <div className="p-4 bg-white shadow-sm border">
-        <div className="flex items-center mb-2 justify-between">
-          <div className="relative w-1/4">
-            <label
-              htmlFor="sl-cours"
-              className="absolute -top-2 left-3 bg-white px-1 text-gray-500 text-xs z-30"
-            >
-              Chương trình đào tạo
-            </label>
-            <Select options={ctdt} className="w-full" />
-          </div>
-          <div className="flex items-center mb-2 w-2/5">
+        <div className="flex items-center mb-2">
+          <div className="flex m-auto items-center w-2/5">
             <label
               htmlFor="default-search"
               className="text-sm font-medium text-gray-900 sr-only"
@@ -77,7 +65,7 @@ const Ctdt = () => {
               <input
                 type="search"
                 id="default-search"
-                className="block w-full p-3 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+                className="block w-full p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Mã học phần..."
                 value={searchTerm}
                 onChange={handleSearch}
@@ -85,7 +73,7 @@ const Ctdt = () => {
               />
               <button
                 type="submit"
-                className="text-white absolute end-1 bottom-1 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                className="text-white absolute end-0 bottom-0 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               >
                 Search
               </button>
@@ -105,7 +93,7 @@ const Ctdt = () => {
                 HỌC PHẦN TIÊN QUYẾT
               </th>
               <th className="border border-gray-400  py-2">YÊU CẦU TÍN CHỈ</th>
-              <th className="border border-gray-400  py-2">KHOA/BỘ MÔN</th>
+              {/* <th className="border border-gray-400  py-2">KHOA/BỘ MÔN</th> */}
             </tr>
           </thead>
           <tbody>
@@ -131,15 +119,21 @@ const Ctdt = () => {
                     {TrainingProgram.coefficient}
                   </td>
                   <td className="px-6 py-4 border-b border-gray-300">
-                    {TrainingProgram.reqiId}
+                    {TrainingProgram.reqiId && TrainingProgram.reqiId.length > 0
+                      ? TrainingProgram.reqiId.map((id, idx) => (
+                          <span key={idx} className="mx-1">
+                            {id}
+                          </span>
+                        ))
+                      : "None"}
                   </td>
                   <td className="px-6 py-4 border-b border-gray-300">
                     {TrainingProgram.requestCredits}
                   </td>
 
-                  <td className="px-6 py-4 border-b border-gray-300">
+                  {/* <td className="px-6 py-4 border-b border-gray-300">
                     {TrainingProgram.department}
-                  </td>
+                  </td> */}
                 </tr>
               ))
             ) : (

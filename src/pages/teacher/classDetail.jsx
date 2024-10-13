@@ -4,44 +4,6 @@ import Select from "react-select";
 import { fetchData, putData } from "../../lib/api";
 import { toast } from "react-toastify";
 
-const initialStudents = [
-  {
-    id: "SV001",
-    name: "Nguyễn Văn A",
-    dob: "01/01/2000",
-    midTerm: 8.5,
-    finalScore: 9.0,
-  },
-  {
-    id: "SV002",
-    name: "Trần Thị B",
-    dob: "15/02/2000",
-    midTerm: 8.5,
-    finalScore: 9.0,
-  },
-  {
-    id: "SV003",
-    name: "Lê Văn C",
-    dob: "20/03/2000",
-    midTerm: 8.5,
-    finalScore: 9.0,
-  },
-  {
-    id: "SV004",
-    name: "Phạm Thị D",
-    dob: "10/04/2000",
-    midTerm: 8.5,
-    finalScore: 9.0,
-  },
-  {
-    id: "SV005",
-    name: "Võ Văn E",
-    dob: "25/05/2000",
-    midTerm: 8.5,
-    finalScore: 9.0,
-  },
-];
-
 const removeDuplicateClassrooms = (classrooms) => {
   const uniqueClassrooms = [];
   const seenIds = new Set();
@@ -57,7 +19,6 @@ const removeDuplicateClassrooms = (classrooms) => {
 };
 
 const ClassDetail = () => {
-  const [students, setStudents] = useState(initialStudents);
   const [editableId, setEditableId] = useState(null);
   const [midTermInput, setMidTermInput] = useState(0);
   const [finalScoreInput, setFinalScoreInput] = useState(0);
@@ -94,7 +55,8 @@ const ClassDetail = () => {
       .then((result) => {
         setClassDetail(result.studentList);
       })
-      .catch((e) => {});
+      .catch((e) => {console.log(e);
+      });
   }, [selectClassRoom, isRefresh]);
 
   const handleEdit = (student) => {
@@ -104,6 +66,16 @@ const ClassDetail = () => {
   };
 
   const handleSave = (student) => {
+
+    const midScore = Number(midTermInput);
+  const finalScore = Number(finalScoreInput);
+
+  // Kiểm tra điểm phải nằm trong khoảng 0 đến 10
+  if (midScore < 0 || midScore > 10 || finalScore < 0 || finalScore > 10) {
+    toast.error("Điểm phải nằm trong khoảng từ 0 đến 10.");
+    return;
+  }
+  
     const dataEdit = {
       midScore: Number(midTermInput),
       endScore: Number(finalScoreInput),

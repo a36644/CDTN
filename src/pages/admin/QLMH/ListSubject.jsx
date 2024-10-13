@@ -1,11 +1,9 @@
 import { FcInfo } from "react-icons/fc";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
-import { deleteData, fetchData, postData, putData } from "../../../lib/api";
+import { fetchData, postData, putData } from "../../../lib/api";
 import "../../../App.css";
 import Select from "react-select";
-import { MultiSelect } from "primereact/multiselect";
-
 import LoadingSpinner from "../../../components/LoadingSpinner";
 import { toast } from "react-toastify";
 
@@ -31,16 +29,15 @@ const ListSubject = () => {
   const [selectedType, setSelectedType] = useState();
   const [isModalNewCoursOpen, setIsModalNewCoursOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCities, setSelectedCities] = useState([]);
+  const [selectedReqiId, setSelectedReqiId] = useState([]);
   const [optionDepartment, setOptionDepartment] = useState([]);
-  const [groupedCities, setGroupedCities] = useState([]);
   const [departmentId, setDepartmentId] = useState([]);
   const [majorId, setMajorId] = useState([]);
   const [listMajorOfDepartment, setListMajorOfDepartment] = useState([]);
-  console.log(
-    "🚀 ~ ListSubject ~ listMajorOfDepartment:",
-    listMajorOfDepartment
-  );
+  const [departmentCourses, setDepartmentCourses] = useState([]);
+  const [majorCourses, setMajorCourses] = useState({});
+  const [coefficient, setCoefficient] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     setLoading(true);
@@ -53,48 +50,18 @@ const ListSubject = () => {
   }, []);
 
   useEffect(() => {
-    if (courses) {
-      const groupedCourses = Object.values(
-        courses.reduce((acc, course) => {
-          const type = course.type;
-          if (!acc[type]) {
-            acc[type] = {
-              label:
-                type === "COSO"
-                  ? "Cơ sở"
-                  : type === "COSONGANH"
-                  ? "Cơ sở Ngành"
-                  : "Chuyên ngành",
-              code: type,
-              items: [],
-            };
-          }
-          acc[type].items.push({
-            label: course.courseName,
-            value: course.courseId,
-            credits: course.credits,
-            coefficient: course.coefficient,
-          });
-          return acc;
-        }, {})
-      );
-      setGroupedCities(groupedCourses);
-    }
-  }, [courses]);
-
-  const groupedItemTemplate = (option) => {
-    return (
-      <div className="flex align-items-center">
-        <img
-          alt={option.label}
-          src="https://primefaces.org/cdn/primereact/images/flag/flag_placeholder.png"
-          className={`mr-2 flag flag-${option.code.toLowerCase()}`}
-          style={{ width: "18px" }}
-        />
-        <div>{option.label}</div>
-      </div>
-    );
-  };
+    setLoading(true);
+    fetchData("admin/Course/getAllBaseCourse")
+      .then((data) => {
+        const courses = data.map((course) => ({
+          value: course.courseId,
+          label: course.courseName,
+        }));
+        setListMajorOfDepartment(courses); // Đặt danh sách khóa học cơ bản mặc định
+      })
+      .catch((e) => toast.error(e.response.data))
+      .finally(() => setLoading(false));
+  }, []);
 
   useEffect(() => {
     const getData = async () => {
@@ -117,7 +84,7 @@ const ListSubject = () => {
   const onSubmit = async (data) => {
     const transformData = {
       ...data,
-      reqiId: selectedCities,
+      reqiId: selectedReqiId,
       departmentId: departmentId,
       majorId: majorId,
       type: selectedType,
@@ -138,8 +105,8 @@ const ListSubject = () => {
         toast.success("Thêm môn học thành công");
         setIsRefresh(!isRefresh);
         setLoading(false);
-      } catch (error) {
-        toast.error("Thêm thành công");
+      } catch (e) {
+        toast.error(e.response.data);
         setIsRefresh(!isRefresh);
       } finally {
         setLoading(false);
@@ -149,51 +116,38 @@ const ListSubject = () => {
     closeModalNewCours();
   };
 
-  // const handleDelete = (id) => {
-  //   const confirm = window.confirm("Bạn có chắc chắn muốn xóa không?");
-  //   if (confirm) {
-  //     deleteData(`admin/Course/deleteCourse`, { id })
-  //       .then(() => {
-  //         toast.success("Xoa thanh cong");
-  //         setIsRefresh(!isRefresh);
-  //       })
-  //       .catch((e) => toast.error(e.data));
-  //   }
-  // };
-
   const openModalNewCours = () => {
     setIsModalNewCoursOpen(true);
   };
 
-  const closeModalNewCours = () => {
-    reset();
-    setIsModalNewCoursOpen(false);
-    setEditingId(null);
-    setSelectedCities([]);
+  const resetPrerequisiteList = () => {
+    setSelectedReqiId([]);
+    setListMajorOfDepartment([]);
+    fetchData("admin/Course/getAllBaseCourse")
+      .then((data) => {
+        const courses = data.map((course) => ({
+          value: course.courseId,
+          label: course.courseName,
+        }));
+        setListMajorOfDepartment(courses); // Đặt lại danh sách khóa học cơ bản mặc định
+      })
+      .catch((error) => console.error("Failed to reset base courses:", error));
   };
 
-  // Hàm chỉnh sửa
-  // const handleEdit = (course) => {
-  //   if (course) {
-  //     setValue("courseId", course.courseId);
-  //     setValue("courseName", course.courseName);
-  //     setValue("credits", course.credits);
-  //     setValue("coefficient", course.coefficient);
-  //     setValue("departmentId", course.departmentId);
-  //     setValue("majorId", course.majorId);
-  //     setSelectedCities(course.prerequisites.map((item) => item.courseId));
-  //     setSelectedType(course.type);
-  //     setEditingId(course);
-  //     openModalNewCours();
-  //   }
-  // };
+  const closeModalNewCours = () => {
+    reset();
+    resetPrerequisiteList();
+    setIsModalNewCoursOpen(false);
+    setDepartmentId([]);
+    setMajorId([]);
+    setEditingId(null);
+    setSelectedReqiId([]);
+  };
 
-  // Hàm tìm kiếm
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
   };
 
-  // Lọc danh sách theo từ khóa tìm kiếm
   const filteredCourseSemester = courses.filter(
     (course) =>
       course.courseId.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -202,53 +156,100 @@ const ListSubject = () => {
 
   useEffect(() => {
     if (selectedType) {
-      setSelectedCities([]);
+      setSelectedReqiId([]);
       setValue("departmentId", null);
       setValue("majorId", null);
     }
   }, [selectedType]);
 
   useEffect(() => {
-    if (departmentId.length) {
-      // Fetch courses for all selected departmentIds
-      Promise.all(
-        departmentId.map((id) =>
-          fetchData(`admin/Course/getAllCoursebyDepartment?id=${id}`)
-            .then((res) =>
-              res.map((course) => ({
-                value: course.courseId,
-                label: course.courseName,
-                departmentId: id, // Associate the course with its department
-              }))
-            )
-            .catch((e) => {
-              console.error(`Failed to fetch courses for departmentId: ${id}`, e);
-              return [];
-            })
-        )
-      ).then((allCourses) => {
-        // Flatten the array of arrays and remove duplicates by courseId
-        const uniqueCourses = allCourses
-          .flat()
-          .reduce((acc, current) => {
-            if (!acc.some((course) => course.value === current.value)) {
-              acc.push(current); // Add course if it's not a duplicate
-            }
-            return acc;
-          }, []);
-  
-        // Update the state with the unique courses
-        setListMajorOfDepartment(uniqueCourses);
+    Promise.all(
+      departmentId.map((id) =>
+        fetchData(`admin/Course/getAllCoursebyDepartment?id=${id}`)
+          .then((res) =>
+            res.map((course) => ({
+              value: course.courseId,
+              label: course.courseName,
+              departmentId: id,
+            }))
+          )
+          .catch((e) => {
+            console.error(`Failed to fetch courses for departmentId: ${id}`, e);
+            return [];
+          })
+      )
+    ).then((allDepartmentCourses) => {
+      const newDepartmentCourses = {};
+      allDepartmentCourses.forEach((courses, index) => {
+        newDepartmentCourses[departmentId[index]] = courses;
       });
-    } else {
-      // If no departmentId is selected, clear the course list
-      setListMajorOfDepartment([]);
-    }
+      setDepartmentCourses(newDepartmentCourses);
+
+      updatePrerequisiteList(newDepartmentCourses, majorCourses);
+    });
   }, [departmentId]);
-  
-  
-  
-  
+
+  useEffect(() => {
+    Promise.all(
+      majorId.map((id) =>
+        fetchData(`admin/Course/getCourseByMajor?id=${id}`)
+          .then((res) =>
+            res.map((course) => ({
+              value: course.courseId,
+              label: course.courseName,
+              majorId: id,
+            }))
+          )
+          .catch((e) => {
+            console.error(`Failed to fetch courses for majorId: ${id}`, e);
+            return [];
+          })
+      )
+    ).then((allMajorCourses) => {
+      const newMajorCourses = {};
+      allMajorCourses.forEach((courses, index) => {
+        newMajorCourses[majorId[index]] = courses;
+      });
+      setMajorCourses(newMajorCourses);
+
+      updatePrerequisiteList(departmentCourses, newMajorCourses);
+    });
+  }, [majorId]);
+
+  const updatePrerequisiteList = (departmentCourses, majorCourses) => {
+    const departmentCoursesArray = Object.values(departmentCourses).flat();
+    const majorCoursesArray = Object.values(majorCourses).flat();
+
+    const combinedCourses = [
+      ...listMajorOfDepartment.filter(
+        (course) => !course.departmentId && !course.majorId
+      ), // giữ các khóa học cơ bản
+      ...departmentCoursesArray,
+      ...majorCoursesArray,
+    ];
+
+    const uniqueCourses = combinedCourses.reduce((acc, current) => {
+      if (!acc.some((course) => course.value === current.value)) {
+        acc.push(current);
+      }
+      return acc;
+    }, []);
+
+    setListMajorOfDepartment(uniqueCourses);
+  };
+
+  const handleCoefficientChange = (e) => {
+    const value = e.target.value;
+
+    // Kiểm tra nếu giá trị không phải là số hoặc nhỏ hơn 0
+    if (value && (isNaN(value) || parseFloat(value) < 0)) {
+      setError('Hệ số không được nhỏ hơn 0 và phải là số');
+    } else {
+      setError(''); // Xóa thông báo lỗi nếu giá trị hợp lệ
+    }
+
+    setCoefficient(value);
+  };
 
   return (
     <div className="">
@@ -263,7 +264,6 @@ const ListSubject = () => {
         <hr className="mb-3"></hr>
         <div className="p-4 bg-white shadow-sm border">
           <div className="w-full mb-2 mx-auto gap-10 flex items-center">
-            {/* Search */}
             <div className="w-1/3">
               <label
                 htmlFor="default-search"
@@ -326,8 +326,6 @@ const ListSubject = () => {
                   <th className="px-4 py-3">Hệ số</th>
                   <th className="px-4 py-3">Phân loại</th>
                   <th className="px-4 py-3">Yêu cầu tín chỉ</th>
-                  {/* <th className="px-4 py-3">Học phần tiên quyết</th> */}
-                  {/* <th className="px-4 py-3 w-[150px]">Chức năng</th> */}
                 </tr>
               </thead>
               <tbody>
@@ -355,23 +353,6 @@ const ListSubject = () => {
                       <td className="px-6 py-4 border-b border-gray-300">
                         {course.requestCredits}
                       </td>
-                      {/* <td className="px-6 py-4 border-b border-gray-300">
-                        {course.prerequisites[0]}
-                      </td> */}
-                      {/* <td className="px-6 py-4 border-b border-gray-300">
-                        <button
-                          onClick={() => handleEdit(course)}
-                          className="mr-auto px-2 text-blue-600"
-                        >
-                          Sửa
-                        </button>
-                        <button
-                          onClick={() => handleDelete(course.courseId)}
-                          className="ml-auto px-2 text-red-600"
-                        >
-                          Xóa
-                        </button>
-                      </td> */}
                     </tr>
                   ))
                 ) : (
@@ -387,12 +368,9 @@ const ListSubject = () => {
         </div>
       </div>
 
-      {/* Modal add new course */}
       {isModalNewCoursOpen && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
-          {/* Modal Content */}
           <div className="relative w-1/2 bg-white rounded-lg shadow">
-            {/* Modal Header */}
             <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
               <h2 className="text-lg font-semibold text-gray-900">
                 {editingId !== null ? "Cập nhật môn học" : "Thêm Môn Học"}
@@ -420,7 +398,6 @@ const ListSubject = () => {
                 <span className="sr-only">Close modal</span>
               </button>
             </div>
-            {/* Modal Body */}
             <form className="p-4 md:p-5" onSubmit={handleSubmit(onSubmit)}>
               <div className="grid gap-2 grid-cols-2">
                 <div className="">
@@ -467,6 +444,7 @@ const ListSubject = () => {
                   <input
                     {...register("credits", { required: true })}
                     type="number"
+                    min={1}
                     id="credits"
                     name="credits"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
@@ -488,8 +466,10 @@ const ListSubject = () => {
                     name="coefficient"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                     placeholder="Hệ số"
+                    onChange={handleCoefficientChange}
                     required
                   />
+                  {error && <p className="text-red-600 font-thin text-xs">{error}</p>}
                 </div>
                 <div className="col-span-2">
                   <label
@@ -501,13 +481,18 @@ const ListSubject = () => {
                   <Select
                     placeholder="Phân loại môn"
                     options={type}
-                    onChange={(e) => setSelectedType(e.value)}
+                    onChange={(e) => {
+                      setSelectedType(e.value);
+                      if (e.value === "COSO") {
+                        resetPrerequisiteList();
+                      }
+                    }}
                     className="text-sm focus-visible:ring"
                   />
                 </div>
                 {selectedType === "COSONGANH" && (
                   <>
-                    <div className="relative z-0 w-full mb-3 group col-span-2">
+                    <div className="relative w-full mb-3 group col-span-2">
                       <label
                         htmlFor="faculty"
                         className="block mb-2 text-sm font-medium text-gray-900"
@@ -591,25 +576,13 @@ const ListSubject = () => {
                   >
                     Học phần tiên quyết
                   </label>
-                  {/* <MultiSelect
-                    value={selectedCities}
-                    options={groupedCities}
-                    onChange={(e) => setSelectedCities(e.value)}
-                    optionLabel="label"
-                    optionGroupLabel="label"
-                    optionGroupChildren="items"
-                    optionGroupTemplate={groupedItemTemplate}
-                    placeholder="Chọn điều kiện tiên quyết"
-                    filter
-                    filterBy="label"
-                    display="chip"
-                    className="w-full md:w-20rem bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded"
-                  /> */}
                   <Select
                     options={listMajorOfDepartment}
                     isMulti
-                    // value={selectedCities}
                     placeholder="Chọn điều kiện tiên quyết"
+                    onChange={(e) =>
+                      setSelectedReqiId(e.map((item) => item.value))
+                    }
                   />
                 </div>
 
@@ -623,6 +596,8 @@ const ListSubject = () => {
                   <input
                     {...register("requestCredits")}
                     type="number"
+                    min={0}
+                    defaultValue={0}
                     name="requestCredits"
                     placeholder="Yêu cầu tín chỉ"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"

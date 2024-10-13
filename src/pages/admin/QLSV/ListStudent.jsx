@@ -6,22 +6,6 @@ import { deleteData, fetchData, postData, putData } from "../../../lib/api";
 import { toast } from "react-toastify";
 import LoadingSpinner from "../../../components/LoadingSpinner";
 
-const faculties = [
-  {
-    name: "IT",
-    majors: ["TT", "TI"],
-  },
-  {
-    name: "Kinh tế",
-    majors: ["Quản trị kinh doanh", "Kinh tế quốc tế", "Tài chính ngân hàng"],
-  },
-  {
-    name: "Kỹ thuật",
-    majors: ["Kỹ thuật cơ khí", "Kỹ thuật điện", "Kỹ thuật ô tô"],
-  },
-];
-
-// eslint-disable-next-line react/prop-types
 const ListStudent = () => {
   const { register, handleSubmit, reset, setValue, watch } = useForm();
   const [students, setStudents] = useState([]);
@@ -51,13 +35,6 @@ const ListStudent = () => {
   }, []);
 
   const faculty = watch("departmentId");
-
-  useEffect(() => {
-    const selectedFaculty = faculties.find((f) => f.name === faculty);
-    if (selectedFaculty) {
-      setValue("major", selectedFaculty.majors[0]);
-    }
-  }, [faculty, setValue]);
 
   // Hàm thêm/sửa sinh viên
   const onSubmit = (data) => {

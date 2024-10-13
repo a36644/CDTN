@@ -42,11 +42,10 @@ const Tkb = () => {
     // Tạo một bảng với 10 tiết và 7 ngày (Thứ 2 đến Chủ nhật)
     const timetable = Array.from({ length: 10 }, () => Array(7).fill(null));
 
-    // Chuyển đổi dữ liệu mẫu vào bảng
     tkb.forEach(({ classRoomId, classRoomName, roomId, start, end }) => {
       for (let period = start; period <= end; period++) {
-        const periodIndex = (period % 10) - 1; // Giả sử period là 1-10
-        const dayIndex = Math.floor((period - 1) / 10); // Giả sử 10 tiết/tuần
+        const periodIndex = (period % 10);
+        const dayIndex = Math.floor((period) / 10);
 
         timetable[periodIndex][dayIndex] = {
           classRoomId,
@@ -77,21 +76,20 @@ const Tkb = () => {
               }
   
               if (!cell) {
-                return <td key={dayIndex} className="border border-gray-300 p-2 max-w-4"></td>; // Empty cell
+                return <td key={dayIndex} className="border border-gray-300 p-2 max-w-4"></td>;
               }
   
               let rowSpan = 1;
-              // Check for overlapping classes
               for (let i = periodIndex + 1; i < 10; i++) {
                 if (timetable[i][dayIndex] && timetable[i][dayIndex].classRoomId === cell.classRoomId) {
                   rowSpan++;
                 } else {
-                  break; // Stop when we find a non-matching cell
+                  break;
                 }
               }
   
               if (rowSpan > 1) {
-                rowSpanTracker[dayIndex] = rowSpan - 1; // Track how many we need to skip
+                rowSpanTracker[dayIndex] = rowSpan - 1;
               }
   
               return (
