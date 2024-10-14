@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { FcInfo } from "react-icons/fc";
-import { RiPencilFill } from "react-icons/ri";
 import { fetchData } from "../../lib/api";
 import { toast } from "react-toastify";
 import LoadingSpinner from "../../components/LoadingSpinner";
@@ -50,6 +49,11 @@ const StudentInfo = () => {
             </div>
             <hr></hr>
             <div className="flex p-4 text-xs font-medium">
+              <p className="w-2/5 ">Ngày sinh</p>
+              <p className="text-gray-400">{student?.dateOfBirth}</p>
+            </div>
+            <hr></hr>
+            <div className="flex p-4 text-xs font-medium">
               <p className="w-2/5 ">Giới tính</p>
               <p className="text-gray-400">
                 {student?.sex === 0 ? "Nữ" : "Nam"}
@@ -68,12 +72,12 @@ const StudentInfo = () => {
               </p>
             </div>
             <hr></hr>
-            <div className="p-4 text-center">
+            {/* <div className="p-4 text-center">
               <button className="bg-red-800 text-white py-2 px-4 rounded text-xs font-semibold">
                 <RiPencilFill className="inline-block text-xl mt-[-5px]" />
                 Cập nhật thông tin cá nhân
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
 

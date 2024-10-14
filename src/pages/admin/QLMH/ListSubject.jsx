@@ -140,6 +140,7 @@ const ListSubject = () => {
     resetPrerequisiteList();
     setIsModalNewCoursOpen(false);
     setDepartmentId([]);
+    setSelectedType("COSO");
     setMajorId([]);
     setEditingId(null);
     setSelectedReqiId([]);

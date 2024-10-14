@@ -41,6 +41,8 @@ const ListSemesterGroup = () => {
     startDate: null,
     endDate: null,
   });
+  const [error, setError] = useState('');
+
 
   useEffect(() => {
     const getData = async () => {
@@ -87,7 +89,6 @@ const ListSemesterGroup = () => {
       timeDKHoc: transformDate(data.timeDKHoc),
       semesterGroupId: editingId?.semesterGroupId
     };
-    console.log("🚀 ~ onSubmit ~ transformData:", transformData)
     if (editingId !== null) {
       await putData("admin/SemesterGroup/updateSemesterGroup", transformData);
       toast.success("Cập nhật thành công")
@@ -165,6 +166,16 @@ const ListSemesterGroup = () => {
   const filteredCourseSemester = semesters.filter((semester) =>
     semester.semesterGroupId.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleCoefficientChange = (e) => {
+    const value = e.target.value;
+    if (value && (isNaN(value) || parseFloat(value) < 0)) {
+      setError('Hệ số không được nhỏ hơn 0 và phải là số');
+    } else {
+      setError('');
+    }
+  };
+
 
   return (
     <div className="w-full bg-gray-100 p-6 overflow-auto mt-16 h-[90vh]">
@@ -358,9 +369,11 @@ const ListSemesterGroup = () => {
                     id="baseCost"
                     name="baseCost"
                     placeholder="vnd/credit"
+                    onChange={handleCoefficientChange}
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                     required
                   />
+                  {error && <p className="text-red-600 font-thin text-xs">{error}</p>}
                 </div>
                 <div className="">
                   <label

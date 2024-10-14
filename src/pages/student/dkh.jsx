@@ -73,7 +73,7 @@ const Dkh = () => {
   const handleClassSelect = (subject, className, schedules) => {
     const newSelected = { ...selected };
     const key = `-${className}`;
-    let previousClassName = null; 
+
 
     if (newSelected[key]) {
       deleteData(`student/register/remove?id=${className}`)
@@ -82,14 +82,31 @@ const Dkh = () => {
           setSelected(newSelected);
 
           const updatedSubjectsData = { ...subjectsData };
-          const classToUpdate = updatedSubjectsData[subject].classes.find(
-            (cls) => cls.name === className
-          );
-          classToUpdate.currentSlot -= 1;
 
           setSubjectsData(updatedSubjectsData);
           setIsRefresh(!isRefresh);
           toast.success("Đã hủy đăng ký lớp học thành công");
+          fetchData("student/register")
+            .then((res) => {
+              setClassRoom(res);
+              const output = res
+                .filter((item) => item.classRoomDtos?.length > 0)
+                .reduce((result, course) => {
+                  const classRooms = course.classRoomDtos.map((classRoom) => ({
+                    name: classRoom.classRoomId,
+                    currentSlot: classRoom.currentSlot,
+                    maxSlot: classRoom.maxSlot,
+                    schedules: classRoom.lichHocList.map((lichHoc) => ({
+                      start: lichHoc.start,
+                      end: lichHoc.finish,
+                    })),
+                  }));
+                  result[course.courseName] = { classes: classRooms };
+                  return result;
+                }, {});
+              setSubjectsData(output);
+            })
+            .catch((e) => toast.error(e.response.data));
         })
         .catch((e) => {
           toast.error(e.response?.data || "Hủy đăng ký thất bại");
@@ -97,14 +114,7 @@ const Dkh = () => {
     } else {
       Object.keys(newSelected).forEach((selectedKey) => {
         if (selectedKey.startsWith(`${subject}-`)) {
-          previousClassName = newSelected[selectedKey].className;
-
-          const previousClass = subjectsData[subject].classes.find(
-            (cls) => cls.name === previousClassName
-          );
-
-          previousClass.currentSlot -= 1; 
-          delete newSelected[selectedKey]; 
+          delete newSelected[selectedKey];
         }
       });
       // Thêm lớp mới
@@ -114,14 +124,30 @@ const Dkh = () => {
           setSelected(newSelected);
 
           const updatedSubjectsData = { ...subjectsData };
-          const classToUpdate = updatedSubjectsData[subject].classes.find(
-            (cls) => cls.name === className
-          );
-          classToUpdate.currentSlot += 1;
-
           setSubjectsData(updatedSubjectsData);
           setIsRefresh(!isRefresh);
           toast.success("Đăng ký lớp học thành công");
+          fetchData("student/register")
+            .then((res) => {
+              setClassRoom(res);
+              const output = res
+                .filter((item) => item.classRoomDtos?.length > 0)
+                .reduce((result, course) => {
+                  const classRooms = course.classRoomDtos.map((classRoom) => ({
+                    name: classRoom.classRoomId,
+                    currentSlot: classRoom.currentSlot,
+                    maxSlot: classRoom.maxSlot,
+                    schedules: classRoom.lichHocList.map((lichHoc) => ({
+                      start: lichHoc.start,
+                      end: lichHoc.finish,
+                    })),
+                  }));
+                  result[course.courseName] = { classes: classRooms };
+                  return result;
+                }, {});
+              setSubjectsData(output);
+            })
+            .catch((e) => toast.error(e.response.data));
         })
         .catch((e) => {
           toast.error(e.response?.data || "Đăng ký thất bại");
@@ -248,7 +274,7 @@ const Dkh = () => {
                   }
                   return acc;
                 }, {})
-              // eslint-disable-next-line no-unused-vars
+                // eslint-disable-next-line no-unused-vars
               ).map(([name, { schedules, currentSlot, maxSlot }]) => (
                 <li key={name} className="flex items-center">
                   <input
@@ -277,7 +303,7 @@ const Dkh = () => {
                       )
                       .join(" | ")})`}
                   </span>
-                  {/* <span className="text-gray-500 ml-2">{`Slots: ${currentSlot}/${maxSlot}`}</span> */}
+                  <span className="text-gray-500 ml-2">{`Slots: ${currentSlot}/${maxSlot}`}</span>
                 </li>
               ))}
             </ul>
