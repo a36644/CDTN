@@ -130,7 +130,7 @@ const ListSubject = () => {
           value: course.courseId,
           label: course.courseName,
         }));
-        setListMajorOfDepartment(courses); // Đặt lại danh sách khóa học cơ bản mặc định
+        setListMajorOfDepartment(courses); 
       })
       .catch((error) => console.error("Failed to reset base courses:", error));
   };

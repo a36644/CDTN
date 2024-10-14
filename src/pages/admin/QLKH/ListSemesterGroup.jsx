@@ -81,6 +81,11 @@ const ListSemesterGroup = () => {
 
   // Hàm thêm/sửa
   const onSubmit = async (data) => {
+    if (error) {
+      toast.error("Vui lòng sửa các lỗi trước khi submit.");
+      return;
+    }
+  
     const transformData = {
       groupId: selectedGroup,
       baseCost: data.baseCost,
