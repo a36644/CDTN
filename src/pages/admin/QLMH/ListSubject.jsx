@@ -36,6 +36,7 @@ const ListSubject = () => {
   const [listMajorOfDepartment, setListMajorOfDepartment] = useState([]);
   const [departmentCourses, setDepartmentCourses] = useState([]);
   const [majorCourses, setMajorCourses] = useState({});
+  // eslint-disable-next-line no-unused-vars
   const [coefficient, setCoefficient] = useState('');
   const [error, setError] = useState('');
 
@@ -240,12 +241,10 @@ const ListSubject = () => {
 
   const handleCoefficientChange = (e) => {
     const value = e.target.value;
-
-    // Kiểm tra nếu giá trị không phải là số hoặc nhỏ hơn 0
     if (value && (isNaN(value) || parseFloat(value) < 0)) {
       setError('Hệ số không được nhỏ hơn 0 và phải là số');
     } else {
-      setError(''); // Xóa thông báo lỗi nếu giá trị hợp lệ
+      setError('');
     }
 
     setCoefficient(value);

@@ -3,6 +3,8 @@ import { FcInfo } from "react-icons/fc";
 import { fetchData } from "../../lib/api";
 import { Toast } from "flowbite-react";
 import LoadingSpinner from "../../components/LoadingSpinner";
+import { FaCheckCircle } from "react-icons/fa";
+import { IoCloseCircle } from "react-icons/io5";
 
 const Kqht = () => {
   const [transcript, setTranscript] = useState([]);
@@ -13,9 +15,10 @@ const Kqht = () => {
     setLoading(true);
     fetchData("student/getTranscript")
       .then((res) => {
-        return setTranscript(res.listCourseGrade)
+        console.log(res);
+        setTranscript(res);
       })
-      .catch((e) => Toast.error(e.response.data))
+      .catch((e) => Toast.error(e.response?.data))
       .finally(() => setLoading(false));
   }, []);
 
@@ -23,9 +26,10 @@ const Kqht = () => {
     setSearchTerm(e.target.value);
   };
 
-  const filteredTrainingProgram = transcript?.filter((TrainingProgram) =>
-    TrainingProgram.courseID.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredTrainingProgram =
+    transcript?.listCourseGrade?.filter((TrainingProgram) =>
+      TrainingProgram.courseID.toLowerCase().includes(searchTerm.toLowerCase())
+    ) || [];
   return (
     <div className="w-full bg-gray-100 p-6 overflow-auto mt-16 h-[90vh]">
       {loading && <LoadingSpinner />}
@@ -83,7 +87,9 @@ const Kqht = () => {
           <thead className="text-xs font-normal">
             <tr className="bg-red-800 text-white">
               <th className="border border-gray-400 py-2">STT</th>
-              <th className="border border-gray-400 py-2 w-[10%]">Mã môn học</th>
+              <th className="border border-gray-400 py-2 w-[10%]">
+                Mã môn học
+              </th>
               <th className="border border-gray-400 py-2">Tên môn học</th>
               <th className="border border-gray-400 py-2">Số TC</th>
               <th className="border border-gray-400 py-2">Điểm quá trình</th>
@@ -94,31 +100,35 @@ const Kqht = () => {
           </thead>
           <tbody>
             {filteredTrainingProgram.length > 0 ? (
-              filteredTrainingProgram.map((transcript, index) => (
+              filteredTrainingProgram.map((course, index) => (
                 <tr key={index} className="hover:bg-gray-100 text-center">
                   <td className="px-6 py-4 border-b border-gray-300">
                     {index + 1}
                   </td>
                   <td className="px-6 py-4 border-b border-gray-300">
-                    {transcript.courseID}
+                    {course.courseID}
                   </td>
                   <td className="px-6 py-4 border-b border-gray-300">
-                    {transcript.courseName}
+                    {course.courseName}
                   </td>
                   <td className="px-6 py-4 border-b border-gray-300">
-                    {transcript.credits}
+                    {course.credits}
                   </td>
                   <td className="px-6 py-4 border-b border-gray-300">
-                    {transcript.midScore}
+                    {course.midScore}
                   </td>
                   <td className="px-6 py-4 border-b border-gray-300">
-                    {transcript.endScore}
+                    {course.endScore}
                   </td>
                   <td className="px-6 py-4 border-b border-gray-300">
-                    {transcript.finalScore}
+                    {course.finalScore}
                   </td>
                   <td className="px-6 py-4 border-b border-gray-300">
-                    {transcript.status}
+                    {course.status === "DAT" ? (
+                      <FaCheckCircle className="w-4 h-4 mx-auto text-green-600" />
+                    ) : (
+                      <IoCloseCircle className="w-4 h-4 mx-auto text-red-600" />
+                    )}
                   </td>
                 </tr>
               ))
@@ -131,6 +141,14 @@ const Kqht = () => {
             )}
           </tbody>
         </table>
+        <div className="px-2 mt-4">
+          <p className="text-sm font-bold text-gray-800">
+            Tổng tín tích lũy: {transcript.totalCredits}
+          </p>
+          <p className="text-sm font-bold text-gray-800">
+            Điểm trung bình: {transcript.score}
+          </p>
+        </div>
       </div>
     </div>
   );

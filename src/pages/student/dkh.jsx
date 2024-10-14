@@ -73,16 +73,14 @@ const Dkh = () => {
   const handleClassSelect = (subject, className, schedules) => {
     const newSelected = { ...selected };
     const key = `-${className}`;
-    let previousClassName = null; // Lưu lại lớp đã chọn trước đó (nếu có)
+    let previousClassName = null; 
 
-    // Nếu lớp đã được chọn, tiến hành hủy đăng ký
     if (newSelected[key]) {
       deleteData(`student/register/remove?id=${className}`)
         .then(() => {
           delete newSelected[key];
           setSelected(newSelected);
 
-          // Cập nhật lại currentSlot cho lớp vừa hủy
           const updatedSubjectsData = { ...subjectsData };
           const classToUpdate = updatedSubjectsData[subject].classes.find(
             (cls) => cls.name === className
@@ -97,7 +95,6 @@ const Dkh = () => {
           toast.error(e.response?.data || "Hủy đăng ký thất bại");
         });
     } else {
-      // Kiểm tra lớp đã đăng ký trước đó (nếu có)
       Object.keys(newSelected).forEach((selectedKey) => {
         if (selectedKey.startsWith(`${subject}-`)) {
           previousClassName = newSelected[selectedKey].className;
@@ -106,8 +103,8 @@ const Dkh = () => {
             (cls) => cls.name === previousClassName
           );
 
-          previousClass.currentSlot -= 1; // Giảm currentSlot cho lớp cũ
-          delete newSelected[selectedKey]; // Xóa lớp cũ
+          previousClass.currentSlot -= 1; 
+          delete newSelected[selectedKey]; 
         }
       });
       // Thêm lớp mới
@@ -116,7 +113,6 @@ const Dkh = () => {
         .then(() => {
           setSelected(newSelected);
 
-          // Cập nhật lại currentSlot cho lớp mới
           const updatedSubjectsData = { ...subjectsData };
           const classToUpdate = updatedSubjectsData[subject].classes.find(
             (cls) => cls.name === className
@@ -252,6 +248,7 @@ const Dkh = () => {
                   }
                   return acc;
                 }, {})
+              // eslint-disable-next-line no-unused-vars
               ).map(([name, { schedules, currentSlot, maxSlot }]) => (
                 <li key={name} className="flex items-center">
                   <input
@@ -280,14 +277,14 @@ const Dkh = () => {
                       )
                       .join(" | ")})`}
                   </span>
-                  <span className="text-gray-500 ml-2">{`Slots: ${currentSlot}/${maxSlot}`}</span>
+                  {/* <span className="text-gray-500 ml-2">{`Slots: ${currentSlot}/${maxSlot}`}</span> */}
                 </li>
               ))}
             </ul>
           )}
         </div>
         <div className="mt-4">
-          <h3 className="font-bold">Timetable:</h3>
+          <h3 className="font-bold mb-2">Thời khóa biểu:</h3>
           <table className="w-full bg-white border-collapse border border-gray-200 text-[13px]">
             <thead className="text-sm">
               <tr className="bg-red-800 text-white ">
